@@ -11,18 +11,19 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.TYPEORM_HOST,
-      port: +process.env.TYPEORM_PORT,
-      username: process.env.TYPEORM_USER,
-      password: process.env.TYPEORM_PASSWORD,
-      database: process.env.TYPEORM_DB,
-      entities: [Board, Card],
-      synchronize: true,
-      logging: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        url: configService.get<string>('DATABASE_URL'),
+        entities: [Board, Card],
+        synchronize: false, // используйте false в продакшене
+        logging: true,
+      }),
     }),
     BoardsModule,
   ],
 })
 export class AppModule {}
+
