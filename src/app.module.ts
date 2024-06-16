@@ -20,6 +20,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       database: process.env.TYPEORM_DB,
       entities: [Board, Card],
       synchronize: true,
+      logging: true,
     }),
     BoardsModule,
   ],
