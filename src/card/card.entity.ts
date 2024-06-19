@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Board } from '../boards/board.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
+import { ColumnEntity } from '../boards/board.entity';
 
 @Entity()
 export class Card {
@@ -9,13 +9,12 @@ export class Card {
   @Column()
   title: string;
 
-  @Column({ nullable: true })
+  @Column()
   description: string;
 
-  @Column({ type: 'enum', enum: ['ToDo', 'In Progress', 'Done'], default: 'ToDo' })
-  column: string;
+  @ManyToOne(() => ColumnEntity, (column) => column.cards)
+  column: ColumnEntity;
+}
 
-  @ManyToOne(() => Board, board => board.cards, { nullable: false, eager: true })
-  board: Board; 
-}  
+
 

@@ -1,60 +1,68 @@
-import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
 import { BoardsService } from './boards.service';
-import { CardsService } from '../card/card.service'; // Зверніть увагу на правильний шлях імпорту
-import { Board } from './board.entity';
-import { Card } from '../card/card.entity';
+import { Board } from '../boards/board.entity';
+import { Card } from 'src/card/card.entity';
 
 @Controller('boards')
 export class BoardsController {
-  
-  constructor(
-    private readonly boardsService: BoardsService,
-    private readonly cardsService: CardsService, // Додайте CardsService
-  ) {}
-
+  constructor(private readonly boardsService: BoardsService) {}
   @Get()
   getAllBoards(): Promise<Board[]> {
     return this.boardsService.getAllBoards();
-  } 
-  
+  }
+  @Post()
+  async createBoard(@Body('name') name: string): Promise<Board> {
+    return this.boardsService.createBoard(name);
+  }
+
   @Get(':id')
-  getBoardById(@Param('id') id: string): Promise<Board> {
+  async getBoard(@Param('id') id: string): Promise<Board> {
     return this.boardsService.getBoardById(id);
   }
 
-  @Post()
-  createBoard(@Body() boardData: Partial<Board>): Promise<Board> {
-    return this.boardsService.createBoard(boardData);
+  @Put(':id')
+  async updateBoard(@Param('id') id: string, @Body('name') name: string): Promise<Board> {
+    return this.boardsService.updateBoard(id, name);
   }
 
-  @Put(':id')
-  updateBoard(@Param('id') id: string, @Body() boardData: Partial<Board>): Promise<Board> {
-    return this.boardsService.updateBoard(id, boardData);
-  }
   @Delete(':id')
-  deleteBoard(@Param('id') id: string): Promise<void> {  
-  
+  async deleteBoard(@Param('id') id: string): Promise<void> {
     return this.boardsService.deleteBoard(id);
   }
 
-  @Post(':boardId/cards')
-  createCard(   @Param('boardId') boardId: string, 
-  @Body() cardData: Partial<Card>,): Promise<Card> {
-    return this.cardsService.createCard(
-    { ...cardData, board: { id: boardId } as Board });
-  }
-
-  @Put(':boardId/cards/:id')
-  updateCard(
+  @Post(':id/cards')
+  async addCard(
     @Param('id') id: string,
-    @Body() cardData: Partial<Card>,
+    @Body('title') title: string,
+    @Body('description') description: string,
   ): Promise<Card> {
-    return this.cardsService.updateCard(id, cardData);
+    return this.boardsService.addCard(id, title, description);
   }
 
-  @Delete(':boardId/cards/:id')
-  deleteCard(@Param('id') id: string): Promise<void> {
-    return this.cardsService.deleteCard(id);
+  @Patch(':id/cards/:cardId')
+  async updateCard(
+    @Param('id') id: string,
+    @Param('cardId') cardId: string,
+    @Body('title') title: string,
+    @Body('description') description: string,
+  ): Promise<Card> {
+    return this.boardsService.updateCard(id, cardId, title, description);
+  }
+
+  @Delete(':id/cards/:cardId')
+  async deleteCard(
+    @Param('id') id: string,
+    @Param('cardId') cardId: string,
+  ): Promise<Board> {
+    return this.boardsService.deleteCard(id, cardId);
+  }
+
+  @Put(':id/cards/:cardId/move')
+  async moveCard(
+    @Param('id') id: string,
+    @Param('cardId') cardId: string,
+    @Body('destinationColumnId') destinationColumnId: string,
+  ): Promise<Card> {
+    return this.boardsService.moveCard(id, cardId, destinationColumnId);
   }
 }
-
