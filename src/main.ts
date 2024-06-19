@@ -6,11 +6,23 @@ async function bootstrap() {
   try {
     const app = await NestFactory.create(AppModule);
 
-    const corsOptions: CorsOptions = {
-      origin: process.env.FRONTEND_URL || 'http://localhost:3000',  
-      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-      allowedHeaders: ['Content-Type', 'Authorization'], 
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+  
+    const isValidUrl = (url: string): boolean => {
+      const urlPattern = /^[a-zA-Z0-9-.:/]*$/;
+      return urlPattern.test(url);
+    };
+
+    if (!isValidUrl(frontendUrl)) {
+      throw new Error(`Invalid FRONTEND_URL: ${frontendUrl}`);
     }
+
+    const corsOptions: CorsOptions = {
+      origin: frontendUrl,
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    };
 
     app.enableCors(corsOptions);
 

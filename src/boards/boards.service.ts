@@ -79,9 +79,6 @@ export class BoardsService {
   async addCard(boardId: string, title: string, description: string): Promise<Card> {
     const board = await this.getBoardById(boardId);
     const column = board.columns.find(col => col.name === 'ToDo');
-    if (!column) {
-      throw new NotFoundException('Column not found');
-    }
     const card = this.cardRepository.create({ title, description, column });
     column.cards.push(card);
     const  saveCard = await this.cardRepository.save(card);
