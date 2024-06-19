@@ -4,7 +4,6 @@ import { BoardsModule } from './boards/boards.module';
 import { Board, ColumnEntity } from './boards/board.entity';
 import { Card } from './card/card.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CardsModule } from './card/card.module';
 
 @Module({
   imports: [
